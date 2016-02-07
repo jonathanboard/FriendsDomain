@@ -26,7 +26,11 @@ namespace FriendsDomain.Core.v1
 
         public GetFriendsResponse GetFriends(GetFriendsRequest request)
         {
-            return new GetFriendsResponse();
+            var returnValue =  new GetFriendsResponse();
+
+            returnValue.Friends = _friendSqlClient.GetFriends();
+
+            return returnValue;
         }
     }
 }

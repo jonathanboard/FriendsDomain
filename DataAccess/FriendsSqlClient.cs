@@ -31,7 +31,32 @@ namespace FriendsDomain.DataAccess
 
         public List<Friend> GetFriends()
         {
-            return new List<Friend>();
+            var returnValue = new List<Friend>();
+            try
+            {
+                using (var dbConnection = new SqlConnection("Data Source=DESKTOP-GO1EQNG; Initial Catalog=Friendly; Integrated Security=SSPI;"))
+                using (var dbCommand = new SqlCommand("[dbo].[GetFriends]", dbConnection))
+                {
+                    dbConnection.Open();
+                    dbCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    var reader = dbCommand.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        var name = reader["FriendName"];
+                        var address = reader["FriendAddress"];
+                        var email = reader["FriendEmail"];
+                        var friendGuid = reader["FriendGuid"];
+                        var team = reader["TeamName"];
+
+                        returnValue.Add(new Friend { Name = (string)name, Address = (string)address, Email = (string)email, FriendGuid = (Guid)friendGuid });
+                    }
+                }
+            }
+            finally
+            {
+                
+            }
+                return returnValue;
         }
     }
 }
