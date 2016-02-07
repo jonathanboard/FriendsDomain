@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="FriendsDomain.Core.v1.FriendsService" %>
