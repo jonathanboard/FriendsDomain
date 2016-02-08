@@ -4,13 +4,14 @@ using System.Linq;
 using System.Web;
 using System.Data.SqlClient;
 using FriendsDomain.Entities;
+using System.Configuration;
 
 namespace FriendsDomain.DataAccess
 {
     public class FriendsSqlClient : SqlClientBase, IFriendsSqlClient
     {
         public FriendsSqlClient() 
-            : this(GetConnectionString())
+            : this(GetConnectionString("FriendsDatabase"))
         {
 
         }
@@ -24,21 +25,24 @@ namespace FriendsDomain.DataAccess
         }
 
 
-        private static string GetConnectionString()
-        {
-            return "hello";
-        }
-
         public List<Friend> GetFriends()
         {
             var returnValue = new List<Friend>();
             try
             {
-                using (var dbConnection = new SqlConnection("Data Source=DESKTOP-GO1EQNG; Initial Catalog=Friendly; Integrated Security=SSPI;"))
-                using (var dbCommand = new SqlCommand("[dbo].[GetFriends]", dbConnection))
+                using (var dbConnection = OpenConnection())
+                using (var dbCommand = CreateCommand(dbConnection)) // new SqlCommand("[dbo].[GetFriends]", dbConnection))
                 {
-                    dbConnection.Open();
-                    dbCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    dbCommand.PrepareStoredProcedure("[dbo].[GetFriends]")
+                    .ExecuteReaderForEach(r => new Friend
+                     {
+                        Name = (string)r["FriendName"],
+                        Address = (string)r["FriendAddress"],
+                        Email = (string)r["FriendEmail"],
+                        FriendGuid = (Guid)r["FriendGuid"]
+                     });
+
+
                     var reader = dbCommand.ExecuteReader();
                     while (reader.Read())
                     {
