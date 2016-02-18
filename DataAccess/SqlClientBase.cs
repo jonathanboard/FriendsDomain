@@ -59,6 +59,77 @@ namespace FriendsDomain.DataAccess
             }
         }
 
+        public static SqlCommand WithParameter(this SqlCommand command, string parameterName, SqlDbType parameterType, object parameterValue)
+        {
+            var sqlParamater = GetParameter(parameterName, parameterType);
+
+            SetParamaterValue(ref sqlParamater, parameterType, parameterValue);
+           
+            return command;            
+        }
+
+        public static SqlCommand WithOutputParameter(this SqlCommand command, string parameterName, SqlDbType parameterType, object parameterValue)
+        {
+            var sqlParamater = GetParameter(parameterName, parameterType);
+            sqlParamater.Direction = ParameterDirection.Output;
+
+            SetParamaterValue(ref sqlParamater, parameterType, parameterValue);
+
+            return command;
+        }
+
+        private static SqlParameter GetParameter(string parameterName, SqlDbType parameterType)
+        {
+            return new SqlParameter(parameterName, parameterType);
+        }
+
+        private static void SetParamaterValue(ref SqlParameter sqlParameter, SqlDbType parameterType, object parameterValue)
+        {
+            switch (parameterType)
+            {
+                case SqlDbType.BigInt:
+                    sqlParameter.Value = (long)parameterValue;
+                    break;
+                case SqlDbType.Binary:
+                case SqlDbType.Bit:
+                    sqlParameter.Value = (bool)parameterValue;
+                    break;
+                case SqlDbType.Char:
+                case SqlDbType.NVarChar:
+                case SqlDbType.NText:
+                case SqlDbType.NChar:
+                case SqlDbType.Text:
+                case SqlDbType.VarChar:
+                    sqlParameter.Value = (string)parameterValue;
+                    break;
+                case SqlDbType.Date:
+                case SqlDbType.DateTime:
+                case SqlDbType.SmallDateTime:
+                    sqlParameter.Value = (DateTime)parameterValue;
+                    break;
+                case SqlDbType.Decimal:
+                case SqlDbType.Money:
+                case SqlDbType.SmallMoney:
+                    sqlParameter.Value = (decimal)parameterValue;
+                    break;
+                case SqlDbType.Float:
+                    sqlParameter.Value = (double)parameterValue;
+                    break;
+                case SqlDbType.Int:
+                    sqlParameter.Value = (int)parameterValue;
+                    break;
+                case SqlDbType.Real:
+                    sqlParameter.Value = (float)parameterValue;
+                    break;
+                case SqlDbType.SmallInt:
+                    sqlParameter.Value = (short)parameterValue;
+                    break;
+                case SqlDbType.UniqueIdentifier:
+                    sqlParameter.Value = (Guid)parameterValue;
+                    break;
+            }
+        }
+
         public static string GetString(this IDataRecord record, string key)
         {
             return (string)record[key];
